@@ -10,7 +10,13 @@ let vm = new Vue({
             width: this.canvasWidth, height: this.canvasHeigth, backgroundColor: 0x000000, resolution: window.devicePixelRatio || 1,
             autoResize: true
         });
-        document.querySelector('body').appendChild(this.app.view);
+        {
+            const e = document.querySelector('body').appendChild(this.app.view);
+            e.style.width = '99vw';
+            e.style.height = 'auto';
+
+        }
+
         this.container = new PIXI.Container();
         this.playerContainer = new PIXI.Container();
         this.enemysContainer = new PIXI.Container();
