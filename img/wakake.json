@@ -1,0 +1,44 @@
+{"frames": {
+
+"swing.png":
+{
+	"frame": {"x":0,"y":0,"w":526,"h":500},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":526,"h":500},
+	"sourceSize": {"w":526,"h":500}
+},
+"wakake-back.png":
+{
+	"frame": {"x":0,"y":500,"w":520,"h":277},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":520,"h":277},
+	"sourceSize": {"w":520,"h":277}
+},
+"wakake-body.png":
+{
+	"frame": {"x":0,"y":777,"w":520,"h":185},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":520,"h":185},
+	"sourceSize": {"w":520,"h":185}
+},
+"wakake-leg.png":
+{
+	"frame": {"x":520,"y":777,"w":65,"h":47},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":47},
+	"sourceSize": {"w":65,"h":47}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "wakake.png",
+	"format": "RGBA8888",
+	"size": {"w":585,"h":962},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:a7e86ac95d2878cf11f2dcb05400f9d1:0bed1db8b84322e3454704dabbf979d9:038e3f31179ac169392277b4983d2555$"
+}
+}
