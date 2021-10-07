@@ -49,13 +49,18 @@ let vm = new Vue({
 
         this.loadImg();
 
+        window.setInterval(() => {
+            this.fps = this.app.ticker.FPS;
+        }, 1000);
 
     },
     data: {
+
         xors: {},
         canvasWidth: 1280,
         canvasHeigth: 720,
         app: {},// PIXI.Application
+        fps: 0,
         container: {},// PIXI.Container
         playerContainer: {},// PIXI.Container
         enemysContainer: {},// PIXI.Container
