@@ -6,15 +6,16 @@ let vm = new Vue({
         this.xors = new Xors();
         this.xors.seed(Date.now());
         this.xors.change(100);
+
         this.app = new PIXI.Application({
             width: this.canvasWidth, height: this.canvasHeigth, backgroundColor: 0x000000, resolution: window.devicePixelRatio || 1,
             autoResize: true
         });
+
         {
             const e = document.querySelector('body').appendChild(this.app.view);
             e.style.width = '99vw';
             e.style.height = 'auto';
-
         }
 
         this.container = new PIXI.Container();
@@ -45,7 +46,7 @@ let vm = new Vue({
         touchContainer.addChild(this.touchSpriteLeft, this.touchSpriteRight);
 
         this.app.stage.addChild(this.container, this.enemysContainer, this.playerContainer, touchContainer);
-        this.app.ticker.add(this.animate);
+        //this.app.ticker.add(this.animate);
 
         this.loadImg();
 
@@ -211,7 +212,7 @@ class Wakake {
 
         this.container.addChild(this.leftLeg, this.mainSprite, this.rightLeg, this.swing);
         vm.playerContainer.addChild(this.container);
-        vm.app.ticker.add(() => { this.animate() });
+        vm.app.ticker.add(this.animate.bind(this));
 
     }
 
@@ -431,7 +432,7 @@ class Prpr {
 
     die() {
         if (!this.alive) return;
-        console.log('prpr die');
+
         this.mainSprite.texture = PIXI.Texture.from("prpr3.png");
         this.alive = false;
         //this.mainSprite.scale.x = 2;
