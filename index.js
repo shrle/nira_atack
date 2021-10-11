@@ -117,7 +117,7 @@ let vm = new Vue({
             }
         },
         setting: function () {
-            this.createPrpr();
+            //this.createPrpr();
 
             const wakake = new Wakake(0, this.floorY - 170);
 
