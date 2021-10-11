@@ -46,7 +46,7 @@ let vm = new Vue({
         touchContainer.addChild(this.touchSpriteLeft, this.touchSpriteRight);
 
         this.app.stage.addChild(this.container, this.enemysContainer, this.playerContainer, touchContainer);
-        //this.app.ticker.add(this.animate);
+        this.app.ticker.add(this.animate);
 
         this.loadImg();
 
@@ -212,7 +212,7 @@ class Wakake {
 
         this.container.addChild(this.leftLeg, this.mainSprite, this.rightLeg, this.swing);
         vm.playerContainer.addChild(this.container);
-        vm.app.ticker.add(this.animate.bind(this));
+        //vm.app.ticker.add(this.animate.bind(this));
 
     }
 
