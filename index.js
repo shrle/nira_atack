@@ -119,7 +119,7 @@ let vm = new Vue({
         setting: function () {
             //this.createPrpr();
 
-            const wakake = new Wakake(0, this.floorY - 170);
+            //const wakake = new Wakake(0, this.floorY - 170);
 
 
             const graphics = new PIXI.Graphics();
