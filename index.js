@@ -46,13 +46,14 @@ let vm = new Vue({
         touchContainer.addChild(this.touchSpriteLeft, this.touchSpriteRight);
 
         this.app.stage.addChild(this.container, this.enemysContainer, this.playerContainer, touchContainer);
-        this.app.ticker.add(this.animate);
+
 
         this.loadImg();
 
         window.setInterval(() => {
             this.fps = this.app.ticker.FPS;
         }, 1000);
+
 
     },
     data: {
@@ -74,8 +75,15 @@ let vm = new Vue({
         touchState: { left: false, right: false },
         watchKeyState: {},
         fcnt: 0,
-        enemys: new Map,
+        wakake: {},
+        enemys: new Map(),
         maxEnemys: 100,
+
+        keyInputs: new Map(),
+        moves: new Map(),
+        collisions: new Map(),
+
+        frameEvent: {},// new FrameEvent()
 
     },
     watch: {
@@ -107,7 +115,8 @@ let vm = new Vue({
         },
         createPrpr: function () {
 
-            window.setTimeout(this.createPrpr, this.xors.rangeRand(2000, 2500));
+            //window.setTimeout(this.createPrpr, this.xors.rangeRand(2000, 2500));
+            vm.frameEvent.set(this.createPrpr.bind(this), this.xors.rangeRand(60 * 2, 60 * 5));
             if (this.enemys.size >= this.maxEnemys) return;
 
             const createEnemyNum = this.xors.rangeRand(1, 3);
@@ -117,10 +126,10 @@ let vm = new Vue({
             }
         },
         setting: function () {
-            //this.createPrpr();
 
-            //const wakake = new Wakake(0, this.floorY - 170);
-
+            this.frameEvent = new FrameEvent();
+            this.createPrpr();
+            this.wakake = new Wakake(0, this.floorY - 170);
 
             const graphics = new PIXI.Graphics();
             graphics.lineStyle(2, 0xFFFFFF);
@@ -130,6 +139,7 @@ let vm = new Vue({
             this.container.addChild(graphics);
 
             this.setKeyEvent();
+            this.app.ticker.add(this.animate);
         },
 
         key: function () {
@@ -170,36 +180,86 @@ let vm = new Vue({
             };
         },
 
+        collisionProc: function () {
+
+        },
+
         animate: function (delta) {
-            this.fcnt++;
-            //TODO: KeyInput
-            //TODO: moves
-            //TODO: collision
+
+            this.frameEvent.update();
+
+            this.wakake.update();
+            this.enemys.forEach((value, enemy) => {
+                if (enemy.update() === false) {
+                    this.enemys.delete(enemy);
+                }
+            });
+
+            this.collisions.forEach((value, collision) => {
+                if (collision.judg() === false) {
+                    this.collisions.delete(collision);
+                }
+            });
+
+
+
         },
     }
 });
 
+class FrameEvent {
+
+    constructor() {
+        this.frameCnt = 0;
+        this.list = new Map();
+    }
+
+    set(func, elapsedFrame) {
+        this.list.set(func, this.frameCnt + elapsedFrame);
+    }
+
+    delete(func) {
+        this.list.delete(func);
+    }
+
+    update() {
+        this.frameCnt++;
+        this.list.forEach((frame, func) => {
+
+            if (this.frameCnt === frame) {
+                func();
+                this.list.delete(func);
+            }
+        });
+    }
+}
+
+class Charcter {
+    /**
+     * 
+     * @returns {boolean} falseを返すとこのオブジェクトは破棄される
+     */
+    update() { }
+}
+
 
 const backMotionFrame = 10;
 
-class Wakake {
-    container = {};
-    mainSprite = {};
-    leftLeg = {};
+class Wakake extends Charcter {
+
     leftLegPos = { x: 198, y: 124 };
-
-    rightLeg = {};
     rightLegPos = { x: 186, y: 136 };
-
-    swing = {};
     swingPos = { x: -178, y: 68 };
 
-    vx = 0;
-    direction = "right";
-    motionFrame = backMotionFrame;
-    niraAtack = null;
 
     constructor(x, y) {
+
+        super();
+
+        this.vx = 0;
+        this.direction = "right";
+        this.motionFrame = backMotionFrame;
+        this.niraAtack = null;
 
         this.container = new PIXI.Container();
         this.container.position.set(x, y);
@@ -212,7 +272,6 @@ class Wakake {
 
         this.container.addChild(this.leftLeg, this.mainSprite, this.rightLeg, this.swing);
         vm.playerContainer.addChild(this.container);
-        //vm.app.ticker.add(this.animate.bind(this));
 
     }
 
@@ -315,7 +374,7 @@ class Wakake {
     }
 
     legFCnt = 0;
-    animate() {
+    update() {
         if (this.motionFrame > 0) {
             this.motionFrame--;
         }
@@ -350,6 +409,8 @@ class Wakake {
             this.rightLeg.x = this.rightLeg.basePos.x;
             this.rightLeg.y = this.rightLeg.basePos.y;
         }
+
+        return true;
     }
 
 
@@ -364,6 +425,7 @@ class Wakake {
         }
 
         this.niraAtack = new NiraAtack(x, y, 170, 100);
+        vm.collisions.set(this.niraAtack);
         window.setTimeout(() => { this.destroyNira(); }, 100);
         this.showSwing();
     }
@@ -376,7 +438,7 @@ class Wakake {
 
 }
 
-class Prpr {
+class Prpr extends Charcter {
     mainSprite = {};
     vx = 0;
     vy = 0;
@@ -395,6 +457,8 @@ class Prpr {
 
     constructor(x, y) {
 
+        super();
+
         for (const tn of this.textureName) {
             this.texture.push(PIXI.Texture.from(tn));
         }
@@ -404,8 +468,6 @@ class Prpr {
         this.mainSprite.position.set(0, 0);
         this.container.addChild(this.mainSprite);
         vm.enemysContainer.addChild(this.container);
-        this.animateBind = this.animate.bind(this);
-        vm.app.ticker.add(this.animateBind);
 
         this.collision = new Collision(x, y, 110, 80);
 
@@ -435,28 +497,31 @@ class Prpr {
 
         this.mainSprite.texture = PIXI.Texture.from("prpr3.png");
         this.alive = false;
-        //this.mainSprite.scale.x = 2;
-        //this.mainSprite.scale.y = 2;
-        //this.container.y = vm.floorY - this.mainSprite.height + 50;
+        this.update = this.dying;
+    }
+
+    dying() {
+
+        if (this.mainSprite.alpha <= 0) {
+            return false;
+        }
+        this.mainSprite.alpha -= 0.01;
+        return true;
     }
 
     destroy() {
-
-        vm.app.ticker.remove(this.animateBind);
         this.mainSprite.destroy();
         this.mainSprite = null;
-        vm.enemys.delete(this);
+        //vm.enemys.delete(this);
     }
-    animate() {
-        if (!this.alive) {
-            if (this.mainSprite.alpha <= 0) {
-                this.destroy();
-                return;
-            }
 
-            this.mainSprite.alpha -= 0.01;
-            return;
-        }
+    /**
+     * 
+     * @returns {boolean} falseを返すとこのオブジェクトは破棄される
+     */
+    update() {
+
+
         if (this.motionFrame > 0) {
             this.motionFrame--;
         }
@@ -474,6 +539,7 @@ class Prpr {
         }
 
         this.collision.setPosition(this.container.x, this.container.y);
+        return true;
     }
 }
 
@@ -537,6 +603,12 @@ class Collision {
             you.y1 < my.y2);
     }
 
+    /**
+    * 
+    * @returns {boolean} falseを返すとこのオブジェクトは破棄される
+    */
+    judg() { }
+
     destroy() {
         this.sprite.destroy();
         this.sprite = null;
@@ -548,21 +620,25 @@ class NiraAtack extends Collision {
 
     constructor(x, y, width, height) {
         super(x, y, width, height);
-        this._hitJudg = this.hitJudg.bind(this);
-        vm.app.ticker.add(this._hitJudg);
     }
 
-    hitJudg() {
+
+    judg() {
         vm.enemys.forEach((value, enemy) => {
             if (this.collision(enemy.collision)) {
                 enemy.die();
             }
         });
+        return true;
     }
 
     destroy() {
         vm.app.ticker.remove(this._hitJudg);
         this.sprite.destroy();
         this.sprite = null;
+        this.judg = () => { return false; };
     }
 }
+
+
+window._vm = vm;
